@@ -18,7 +18,7 @@ end
 -- 3.3 扣库存(redis)
 redis.call('incrby', stockKey, -1)
 -- 3.4 下单,记录用户到set
-redis.add('sadd', orderKey, userId)
+redis.call('sadd', orderKey, userId)
 -- 3.5 发送消息到队列 xadd stream.orders * k1 v1 k2 v2
 redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)
 return 0
