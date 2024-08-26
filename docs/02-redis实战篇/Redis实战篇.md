@@ -2528,7 +2528,7 @@ private void init() {
 消息队列（Message Queue），字面意思就是存放消息的队列。而Redis的list数据结构是一个双向链表，很容易模拟出队列效果。
 
 队列是入口和出口不在一边，因此我们可以利用：LPUSH 结合 RPOP、或者 RPUSH 结合 LPOP来实现。
-不过要注意的是，当队列中没有消息时RPOP或LPOP操作会返回null，并不像JVM的阻塞队列那样会阻塞并等待消息。因此这里应该使用BRPOP或者BLPOP来实现阻塞效果。
+不过要注意的是，当队列中没有消息时RPOP或LPOP操作会返回null，并不像JVM的阻塞队列那样会阻塞并等待消息。因此这里应该使用**BRPOP或者BLPOP来实现阻塞效果**。
 
 ![1653575176451](.\Redis实战篇.assets\1653575176451.png)
 
@@ -2614,12 +2614,34 @@ STREAM类型消息队列的XREAD命令特点：
 
 ![1653577801668](.\Redis实战篇.assets\1653577801668.png)
 
+```shell
+# 创建队列
+xadd s1 * k1 v1
+xadd s1 * k2 v2
+xadd s1 * k3 v3
+xadd s1 * k4 v4
+xlen s1
+xread count 1 streams s1 $
+xread count 1 block 0 streams s1 $
+# 创建消费者组
+xgroup create s1 g1 0
+xreadgroup group g1 c1 count 1 block 2000 streams s1 > # 读取队列中未消费的第一条消息
+xack s1 g1 164339018049-0  # 消息确认
+xpending s1 g1 - + 10  # pending-list中所有未确认的消息,取10条
+xreadgroup group g1 c1 count 1 block 2000 streams s1 0 # 读取pending-list中的第一条消息
+```
+
+
+
 创建消费者组：
 ![1653577984924](.\Redis实战篇.assets\1653577984924.png)
 key：队列名称
 groupName：消费者组名称
 ID：起始ID标示，$代表队列中最后一个消息，0则代表队列中第一个消息
 MKSTREAM：队列不存在时自动创建队列
+
+`xgroup create s1 g1 0`
+
 其它常见命令：
 
  **删除指定的消费者组**
@@ -2676,6 +2698,12 @@ XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREA
 需求：
 
 * 创建一个Stream类型的消息队列，名为stream.orders
+
+```shell
+# 指定消息队列stream创建消费者组g1,从队列的第一个消息开始处理 stream不存在时自动创建
+xgroup create stream.orders g1 0 mkstream
+```
+
 * 修改之前的秒杀下单Lua脚本，在认定有抢购资格后，直接向stream.orders中添加消息，内容包含voucherId、userId、orderId
 * 项目启动时，开启一个线程任务，尝试获取stream.orders中的消息，完成下单\
 
