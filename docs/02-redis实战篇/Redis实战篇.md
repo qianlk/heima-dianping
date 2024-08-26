@@ -3030,6 +3030,12 @@ public Result queryBlogLikes(@PathVariable("id") Long id) {
 
 BlogService
 
+查询顺序和输入顺序一致
+
+order by field(id, 输入顺序)
+
+![image-20240826235308453](./assets/Redis实战篇/image-20240826235308453.png)
+
 ```java
 @Override
 public Result queryBlogLikes(Long id) {
