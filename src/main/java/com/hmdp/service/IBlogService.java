@@ -1,8 +1,8 @@
 package com.hmdp.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.Blog;
-import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
@@ -33,4 +33,13 @@ public interface IBlogService extends IService<Blog> {
     Result queryBlogLikes(Long id);
 
     Result saveBlog(Blog blog);
+
+    /**
+     * 滚动分页获取用户收件箱中的推送数据
+     *
+     * @param max
+     * @param offset
+     * @return
+     */
+    Result queryBlogOfFollow(Long max, Integer offset);
 }

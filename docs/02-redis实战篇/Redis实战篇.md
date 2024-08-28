@@ -3363,6 +3363,8 @@ public Result saveBlog(Blog blog) {
 
 ### 9.5好友关注-实现分页查询收邮箱
 
+![image-20240828100833680](./assets/Redis实战篇/image-20240828100833680.png)
+
 需求：在个人主页的“关注”卡片中，查询并展示推送的Blog信息：
 
 具体操作如下：
