@@ -3470,7 +3470,7 @@ geodist g1 bjn bjz [km] (默认单位是m)
 geosearch g1 FROMLONLAT 116.397904 39.909005 BYRADIUS 10 KM WITHDIST
 
 geopos g1 bjz # 返回坐标
-geohash g1 bjz # 
+geohash g1 bjz # 返回hash
 ```
 
 
@@ -3683,6 +3683,27 @@ BitMap的操作命令有：
 * BITOP ：将多个BitMap的结果做位运算（与 、或、异或）
 * BITPOS ：查找bit数组中指定范围内第一个0或1出现的位置
 
+```
+setbit bm1 0 1
+setbit bm1 1 1
+setbit bm1 2 1
+setbit bm1 5 1
+setbit bm1 7 1
+
+GETBIT bm1 2
+BITCOUNT bm1
+
+# 11100101
+BITFIELD bm1 get u1 0  # 表示从0位开始,以无符号(u)获取1位的十进制数 1 --> 1
+BITFIELD bm1 get u2 0 # 表示从0位开始,以无符号(u)获取2位的十进制数 11 --> 3
+BITFIELD bm1 get u4 0  # 表示从0位开始,以无符号(u)获取4位的十进制数 1110 --> 14
+BITFIELD bm1 get u5 0  # 表示从0位开始,以无符号(u)获取1位的十进制数 11100 --> 28=4+8+16
+
+BITPOS bm1 0 [start end]# 首次出现0的位置 --> 3
+```
+
+
+
 #### 11.2 、用户签到-实现签到功能
 
 需求：实现签到接口，将当前用户当天签到信息保存到Redis中
@@ -3735,7 +3756,7 @@ Java逻辑代码：获得当前这个月的最后一次签到数据，定义一�
 
 **问题2：**如何得到本月到今天为止的所有签到数据？
 
-  BITFIELD key GET u[dayOfMonth] 0
+`  BITFIELD key GET u[dayOfMonth] 0`
 
 假设今天是10号，那么我们就可以从当前月的第一天开始，获得到当前这一天的位数，是10号，那么就是10位，去拿这段时间的数据，就能拿到所有的数据了，那么这10天里边签到了多少次呢？统计有多少个1即可。
 
