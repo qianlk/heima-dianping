@@ -3457,6 +3457,24 @@ public Result queryBlogOfFollow(Long max, Integer offset) {
 
 ## 10、附近商户
 
+![image-20240829095134081](./assets/Redis实战篇/image-20240829095134081.png)
+
+```shell
+# 添加数据,底层设计zset
+geoadd g1 116.378248 39.865275 bjn 116.42803 39.903738 bjz 116.322287 39.893729 bjx
+
+#  计算北京西站到北京站的距离
+geodist g1 bjn bjz [km] (默认单位是m)
+
+# 搜索天安门(116.397904 39.909005)附近10km内的所有火车站,并按照升序排序
+geosearch g1 FROMLONLAT 116.397904 39.909005 BYRADIUS 10 KM WITHDIST
+
+geopos g1 bjz # 返回坐标
+geohash g1 bjz # 
+```
+
+
+
 ### 10.1、附近商户-GEO数据结构的基本用法
 
 GEO就是Geolocation的简写形式，代表地理坐标。Redis在3.2版本中加入了对GEO的支持，允许存储地理坐标信息，帮助我们根据经纬度来检索数据。常见的命令有：
@@ -3465,9 +3483,13 @@ GEO就是Geolocation的简写形式，代表地理坐标。Redis在3.2版本中�
 * GEODIST：计算指定的两个点之间的距离并返回
 * GEOHASH：将指定member的坐标转为hash字符串形式并返回
 * GEOPOS：返回指定member的坐标
-* GEORADIUS：指定圆心、半径，找到该圆内包含的所有member，并按照与圆心之间的距离排序后返回。6.以后已废弃
-* GEOSEARCH：在指定范围内搜索member，并按照与指定点之间的距离排序后返回。范围可以是圆形或矩形。6.2.新功能
-* GEOSEARCHSTORE：与GEOSEARCH功能一致，不过可以把结果存储到一个指定的key。 6.2.新功能
+* GEORADIUS：指定圆心、半径，找到该圆内包含的所有member，并按照与圆心之间的距离排序后返回。**6以后已废弃**
+* GEOSEARCH：在指定范围内搜索member，并按照与指定点之间的距离排序后返回。范围可以是圆形或矩形。**6.2.新功能**
+* GEOSEARCHSTORE：与GEOSEARCH功能一致，不过可以把结果存储到一个指定的key。 **6.2.新功能**
+
+
+
+案例: 
 
 ### 10.2、 附近商户-导入店铺数据到GEO
 
